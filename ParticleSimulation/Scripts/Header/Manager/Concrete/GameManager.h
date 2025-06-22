@@ -1,0 +1,34 @@
+#ifndef _GAME_MANAGER_H_
+#define _GAME_MANAGER_H_
+
+#include <SDL.h>
+
+#include "../Manager.hpp"
+
+class GameManager :public Manager<GameManager>
+{
+	friend class Manager<GameManager>;
+
+private:
+	SDL_Window* window = nullptr;              //游戏主窗口
+	SDL_Renderer* renderer = nullptr;          //GPU加速渲染器
+	SDL_Event event;                           //SDL事件捕获
+	bool isQuit = false;
+	int fps = 60;                              //游戏帧率
+
+	SDL_Point cursorPosition = { 0,0 };        //鼠标指针坐标
+
+public:
+	int Run(int, char**);                      //游戏程序主循环
+
+private:
+	GameManager();
+	~GameManager();
+	void InitAssert(bool, const char*);        //初始化断言
+
+	void OnInput();
+	void OnUpdate(double);
+	void OnRender();
+};
+
+#endif

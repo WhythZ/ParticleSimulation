@@ -13,5 +13,39 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\Manager">
+      <UniqueIdentifier>{346596b8-76ec-4768-9ef8-a352799af49e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Manager\Concrete">
+      <UniqueIdentifier>{20c47497-d572-4d73-8748-7bcdf4d3d2f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Manager">
+      <UniqueIdentifier>{b4fc6e88-38d7-4a68-9e73-a84b0617e48e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Manager\Concrete">
+      <UniqueIdentifier>{7eaac0d2-1109-4525-81c0-ece86886bffe}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Scripts\Source\Main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Source\Manager\Concrete\GameManager.cpp">
+      <Filter>源文件\Manager\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Source\Manager\Concrete\ResourceManager.cpp">
+      <Filter>源文件\Manager\Concrete</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Scripts\Header\Manager\Manager.hpp">
+      <Filter>头文件\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Header\Manager\Concrete\GameManager.h">
+      <Filter>头文件\Manager\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Header\Manager\Concrete\ResourceManager.h">
+      <Filter>头文件\Manager\Concrete</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
