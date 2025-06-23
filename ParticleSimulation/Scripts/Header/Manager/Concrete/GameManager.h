@@ -14,7 +14,6 @@ private:
 	SDL_Renderer* renderer = nullptr;          //GPU加速渲染器
 	SDL_Event event;                           //SDL事件捕获
 	bool isQuit = false;
-	int fps = 60;                              //游戏帧率
 
 	SDL_Point cursorPosition = { 0,0 };        //鼠标指针坐标
 

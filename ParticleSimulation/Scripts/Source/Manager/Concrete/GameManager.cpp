@@ -6,6 +6,13 @@
 
 #include "../../../Header/Manager/Concrete/ResourceManager.h"
 
+#pragma region AppConfigs
+const char* WINDOW_TITLE = "ParticleSimulation";  //窗口标题
+const size_t WINDOW_WIDTH = 1344;                 //窗口宽度
+const size_t WINDOW_HEIGHT = 720;                 //窗口高度
+const size_t FPS = 60;                            //帧数上限
+#pragma endregion
+
 GameManager::GameManager()
 {
 	#pragma region SDL
@@ -23,10 +30,10 @@ GameManager::GameManager()
 
 	#pragma region Window&Renderer
 	//从屏幕中心显示一个带标题的特定尺寸的一般样式的窗口
-	window = SDL_CreateWindow("ParticleSimulation", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		1344, 720, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+		WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 	//检测窗口是否初始化成功
-	InitAssert(window, "Failed To Create Window");
+	InitAssert(window, u8"Failed To Create Window");
 
 	//加载渲染器到窗口window上，第三参数位使用了三种渲染技术
 	//SDL_RENDERER_ACCELERATED：硬件加速
@@ -34,7 +41,7 @@ GameManager::GameManager()
 	//SDL_RENDERER_TARGETTEXTURE：将渲染目标设置为纹理，即先渲染纹理图片，再将图片渲染到窗口，用于瓦片地图的生成
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_TARGETTEXTURE);
 	//检测渲染器是否初始化成功
-	InitAssert(renderer, "Failed To Create Renderer");
+	InitAssert(renderer, u8"Failed To Create Renderer");
 
 	//使得在打开SDL窗口时若是输入中文可以显示候选词列表，以提醒玩家切换为英文输入法，因为中文输入无法被正常捕获
 	SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
@@ -42,7 +49,7 @@ GameManager::GameManager()
 
 	#pragma region LoadResource
 	//加载资源
-	InitAssert(ResourceManager::Instance().LoadResource(renderer), "Failed To Load Resources");
+	InitAssert(ResourceManager::Instance().LoadResource(renderer), u8"Failed To Load Resources");
 	#pragma endregion
 }
 
@@ -78,8 +85,8 @@ int GameManager::Run(int _argc, char** _argv)
 		//将当前的次数作为起点，进行下一次循环
 		_lastCounter = _currentCounter;
 		//动态延时控制帧率，若是帧率超过了限定值，那么就将多余的时间延迟掉防止主循环频率过快；乘以1000是将秒转化为毫秒，因为秒这个单位太大而精度不高
-		if (_delta * 1000 < 1000.0 / fps)
-			SDL_Delay((Uint32)(1000.0 / fps - _delta * 1000));
+		if (_delta * 1000 < 1000.0 / FPS)
+			SDL_Delay((Uint32)(1000.0 / FPS - _delta * 1000));
 		#pragma endregion
 
 		//拉取并处理事件以保证窗口正常交互

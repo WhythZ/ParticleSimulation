@@ -25,6 +25,18 @@
     <Filter Include="源文件\Manager\Concrete">
       <UniqueIdentifier>{7eaac0d2-1109-4525-81c0-ece86886bffe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="头文件\Particle">
+      <UniqueIdentifier>{43e033ad-f116-4a6d-8578-23e54770f038}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Particle">
+      <UniqueIdentifier>{6d3bc529-dbaf-44bf-b197-6c6eeaf4b863}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\Infrastructure">
+      <UniqueIdentifier>{f1a40b1e-a7ea-4b12-bfea-cb5b9ab996d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Infrastructure">
+      <UniqueIdentifier>{528623ed-226a-479a-b31d-7ca65cb01eda}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Scripts\Source\Main.cpp">
@@ -36,6 +48,12 @@
     <ClCompile Include="Scripts\Source\Manager\Concrete\ResourceManager.cpp">
       <Filter>源文件\Manager\Concrete</Filter>
     </ClCompile>
+    <ClCompile Include="Scripts\Source\Infrastructure\Timer.cpp">
+      <Filter>源文件\Infrastructure</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Source\Infrastructure\Vector2f.cpp">
+      <Filter>源文件\Infrastructure</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scripts\Header\Manager\Manager.hpp">
@@ -46,6 +64,18 @@
     </ClInclude>
     <ClInclude Include="Scripts\Header\Manager\Concrete\ResourceManager.h">
       <Filter>头文件\Manager\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Header\Particle\ParticleType.h">
+      <Filter>头文件\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Header\Infrastructure\Vector2f.h">
+      <Filter>头文件\Infrastructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Header\Infrastructure\Timer.h">
+      <Filter>头文件\Infrastructure</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Header\Particle\Particle.h">
+      <Filter>头文件\Particle</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
