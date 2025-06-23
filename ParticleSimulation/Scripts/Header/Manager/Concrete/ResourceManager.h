@@ -32,15 +32,15 @@ private:
 	//TexturePool texturePool;              //图像享元池
 	//MusicPool musicPool;                  //音乐享元池
 	//SoundPool soundPool;                  //音效享元池
-	FontPool fontPool;                    //字体享元池
+	FontPool fontPool;                      //字体享元池
 
 public:
-	bool LoadResource(SDL_Renderer*);     //加载所有资源
+	bool LoadResource(SDL_Renderer*);       //加载所有资源
 
 	//const TexturePool& GetTexturePool();  //获取只读图像享元池
 	//const MusicPool& GetMusicPool();      //获取只读音频享元池
 	//const SoundPool& GetSoundPool();      //获取只读音效享元池
-	const FontPool& GetFontPool();        //获取只读图像享元池
+	const FontPool& GetFontPool();          //获取只读图像享元池
 
 private:
 	ResourceManager() = default;
@@ -49,7 +49,7 @@ private:
 	//bool LoadTextureRes(SDL_Renderer*);   //从文件中加载图像资产
 	//bool LoadMusicRes();                  //从文件中加载音乐资产
 	//bool LoadSoundRes();                  //从文件中加载音效资产
-	bool LoadFontRes();                   //从文件中加载字体资产
+	bool LoadFontRes();                     //从文件中加载字体资产
 };
 
 #endif

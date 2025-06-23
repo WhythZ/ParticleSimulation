@@ -5,6 +5,8 @@
 #include <SDL_mixer.h>
 
 #include "../../../Header/Manager/Concrete/ResourceManager.h"
+#include "../../../Header/Manager/Concrete/ParticleManager.h"
+#include "../../../Header/Manager/Concrete/UIManager.h"
 
 #pragma region AppConfigs
 const char* WINDOW_TITLE = "ParticleSimulation";  //窗口标题
@@ -135,12 +137,23 @@ void GameManager::OnInput()
 		cursorPosition.x = event.motion.x;
 		cursorPosition.y = event.motion.y;
 	}
+
+	//更新UI的输入检测
+	UIManager::Instance().OnInput(event);
 }
 
 void GameManager::OnUpdate(double _delta)
 {
+	//更新各类粒子
+	ParticleManager::Instance().OnUpdate(_delta);
+	//更新UI界面
+	UIManager::Instance().OnUpdate(renderer);
 }
 
 void GameManager::OnRender()
 {
+	//渲染各类粒子
+	ParticleManager::Instance().OnRender(renderer);
+	//渲染UI界面
+	UIManager::Instance().OnRender(renderer);
 }

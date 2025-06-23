@@ -28,9 +28,6 @@
     <Filter Include="头文件\Particle">
       <UniqueIdentifier>{43e033ad-f116-4a6d-8578-23e54770f038}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Particle">
-      <UniqueIdentifier>{6d3bc529-dbaf-44bf-b197-6c6eeaf4b863}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\Infrastructure">
       <UniqueIdentifier>{f1a40b1e-a7ea-4b12-bfea-cb5b9ab996d0}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,12 @@
     <ClCompile Include="Scripts\Source\Infrastructure\Vector2f.cpp">
       <Filter>源文件\Infrastructure</Filter>
     </ClCompile>
+    <ClCompile Include="Scripts\Source\Manager\Concrete\ParticleManager.cpp">
+      <Filter>源文件\Manager\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Source\Manager\Concrete\UIManager.cpp">
+      <Filter>源文件\Manager\Concrete</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scripts\Header\Manager\Manager.hpp">
@@ -65,9 +68,6 @@
     <ClInclude Include="Scripts\Header\Manager\Concrete\ResourceManager.h">
       <Filter>头文件\Manager\Concrete</Filter>
     </ClInclude>
-    <ClInclude Include="Scripts\Header\Particle\ParticleType.h">
-      <Filter>头文件\Particle</Filter>
-    </ClInclude>
     <ClInclude Include="Scripts\Header\Infrastructure\Vector2f.h">
       <Filter>头文件\Infrastructure</Filter>
     </ClInclude>
@@ -76,6 +76,12 @@
     </ClInclude>
     <ClInclude Include="Scripts\Header\Particle\Particle.h">
       <Filter>头文件\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Header\Manager\Concrete\ParticleManager.h">
+      <Filter>头文件\Manager\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Header\Manager\Concrete\UIManager.h">
+      <Filter>头文件\Manager\Concrete</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

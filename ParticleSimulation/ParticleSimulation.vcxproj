@@ -137,12 +137,15 @@
     <ClCompile Include="Scripts\Source\Infrastructure\Vector2f.cpp" />
     <ClCompile Include="Scripts\Source\Main.cpp" />
     <ClCompile Include="Scripts\Source\Manager\Concrete\GameManager.cpp" />
+    <ClCompile Include="Scripts\Source\Manager\Concrete\ParticleManager.cpp" />
     <ClCompile Include="Scripts\Source\Manager\Concrete\ResourceManager.cpp" />
+    <ClCompile Include="Scripts\Source\Manager\Concrete\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scripts\Header\Infrastructure\Timer.h" />
     <ClInclude Include="Scripts\Header\Infrastructure\Vector2f.h" />
-    <ClInclude Include="Scripts\Header\Particle\ParticleType.h" />
+    <ClInclude Include="Scripts\Header\Manager\Concrete\ParticleManager.h" />
+    <ClInclude Include="Scripts\Header\Manager\Concrete\UIManager.h" />
     <ClInclude Include="Scripts\Header\Particle\Particle.h" />
     <ClInclude Include="Scripts\Header\Manager\Concrete\GameManager.h" />
     <ClInclude Include="Scripts\Header\Manager\Concrete\ResourceManager.h" />
