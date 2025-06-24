@@ -10,9 +10,9 @@
 
 #pragma region AppConfigs
 const char* WINDOW_TITLE = "ParticleSimulation";  //窗口标题
-const size_t WINDOW_WIDTH = 1344;                 //窗口宽度
-const size_t WINDOW_HEIGHT = 720;                 //窗口高度
-const size_t FPS = 60;                            //帧数上限
+const int WINDOW_WIDTH = 1344;                    //窗口宽度
+const int WINDOW_HEIGHT = 720;                    //窗口高度
+const int FPS = 60;                               //帧数上限
 #pragma endregion
 
 GameManager::GameManager()
@@ -34,6 +34,8 @@ GameManager::GameManager()
 	//从屏幕中心显示一个带标题的特定尺寸的一般样式的窗口
 	window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+	//记录窗口矩形区域
+	windowRect = { 0, 0, (int)WINDOW_WIDTH, (int)WINDOW_HEIGHT };
 	//检测窗口是否初始化成功
 	InitAssert(window, u8"Failed To Create Window");
 

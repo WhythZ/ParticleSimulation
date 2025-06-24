@@ -83,5 +83,8 @@
     <ClInclude Include="Scripts\Header\Manager\Concrete\UIManager.h">
       <Filter>头文件\Manager\Concrete</Filter>
     </ClInclude>
+    <ClInclude Include="Scripts\Header\Particle\ParticleType.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

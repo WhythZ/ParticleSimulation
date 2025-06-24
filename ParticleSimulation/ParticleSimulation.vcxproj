@@ -150,6 +150,7 @@
     <ClInclude Include="Scripts\Header\Manager\Concrete\GameManager.h" />
     <ClInclude Include="Scripts\Header\Manager\Concrete\ResourceManager.h" />
     <ClInclude Include="Scripts\Header\Manager\Manager.hpp" />
+    <ClInclude Include="Scripts\Header\Particle\ParticleType.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

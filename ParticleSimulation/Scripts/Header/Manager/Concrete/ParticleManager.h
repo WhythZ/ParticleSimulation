@@ -1,5 +1,9 @@
 #ifndef _PARTICLE_MANAGER_H_
 
+#include <unordered_map>
+#include <random>
+#include <functional>
+
 #include <SDL.h>
 
 #include "../Manager.hpp"
@@ -9,39 +13,61 @@ class ParticleManager :public Manager<ParticleManager>
 {
 	friend class Manager<ParticleManager>;
 
-private:
+public:
+	std::unordered_map<ParticleType, SDL_Color> particleColors;
 
+private:
+	SDL_Rect windowRect;                              //窗口矩形区域（从GameManager处获取）
+
+	#pragma region DoubleBuffer
+	Particle* frontBuffer = nullptr;                  //当前帧粒子状态（双缓冲技术）
+	Particle* backBuffer = nullptr;                   //下一帧粒子状态（双缓冲技术）
+	#pragma endregion
+
+	#pragma region RandomEngine
+	std::mt19937 rng;                                 //随机数生成器
+	std::uniform_int_distribution<int> dist{ 0, 1 };  //用于随机方向选择
+	#pragma endregion
 
 public:
 	void OnUpdate(double);
 	void OnRender(SDL_Renderer*);
 
+	void AddParticle(int, int, ParticleType);
+	void RemoveParticle(int, int);
+	void ClearParticles();
+
 private:
-	ParticleManager() = default;
-	~ParticleManager() = default;
+	ParticleManager();
+	~ParticleManager();
+
+	void SwapBuffers();                               //交换双缓冲
+
+	Particle GetParticle(int, int) const;
+	bool IsValidPosition(int, int) const;             //检查位置是否有效
 
 	#pragma region UpdateSpecificParticleType
-	void UpdateEmpty();
+	void UpdateEmpty(int, int);
 
-	void UpdateDirt();
-	void UpdateStone();
-	void UpdateWood();
-	void UpdateIce();
+	void UpdateDirt(int, int);
+	void UpdateStone(int, int);
+	void UpdateWood(int, int);
+	void UpdateIce(int, int);
 
-	void UpdateSand();
-	void UpdateSnow();
-	void UpdateGunPowder();
-	void UpdateSalt();
+	void UpdateSand(int, int);
+	void UpdateSnow(int, int);
+	void UpdateGunPowder(int, int);
+	void UpdateSalt(int, int);
 
-	void UpdateWater();
-	void UpdateOil();
-	void UpdateAcid();
-	void UpdateLava();
+	void UpdateWater(int, int);
+	void UpdateOil(int, int);
+	void UpdateAcid(int, int);
+	void UpdateLava(int, int);
 
-	void UpdateFire();
+	void UpdateFire(int, int);
 
-	void UpdateSmoke();
-	void UpdateSteam();
+	void UpdateSmoke(int, int);
+	void UpdateSteam(int, int);
 	#pragma endregion
 };
 
