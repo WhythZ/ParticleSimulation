@@ -8,12 +8,10 @@
 #include "../../../Header/Manager/Concrete/ParticleManager.h"
 #include "../../../Header/Manager/Concrete/UIManager.h"
 
-#pragma region AppConfigs
 const char* WINDOW_TITLE = "ParticleSimulation";  //窗口标题
 const int WINDOW_WIDTH = 1344;                    //窗口宽度
 const int WINDOW_HEIGHT = 720;                    //窗口高度
-const int FPS = 60;                               //帧数上限
-#pragma endregion
+const int FPS = 120;                              //帧数上限
 
 GameManager::GameManager()
 {
@@ -132,13 +130,6 @@ void GameManager::OnInput()
 	//点击窗口的退出键时触发的SDL_QUIT事件
 	if (event.type == SDL_QUIT)
 		isQuit = true;
-	//鼠标指针移动事件
-	if (event.type == SDL_MOUSEMOTION)
-	{
-		//获取鼠标指针坐标
-		cursorPosition.x = event.motion.x;
-		cursorPosition.y = event.motion.y;
-	}
 
 	//更新UI的输入检测
 	UIManager::Instance().OnInput(event);

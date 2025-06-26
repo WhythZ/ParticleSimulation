@@ -1,6 +1,5 @@
 #ifndef _PARTICLE_MANAGER_H_
 
-#include <unordered_map>
 #include <random>
 #include <functional>
 
@@ -12,9 +11,6 @@
 class ParticleManager :public Manager<ParticleManager>
 {
 	friend class Manager<ParticleManager>;
-
-public:
-	std::unordered_map<ParticleType, SDL_Color> particleColors;
 
 private:
 	SDL_Rect windowRect;                              //窗口矩形区域（从GameManager处获取）
@@ -57,7 +53,6 @@ private:
 	void UpdateSand(int, int);
 	void UpdateSnow(int, int);
 	void UpdateGunPowder(int, int);
-	void UpdateSalt(int, int);
 
 	void UpdateWater(int, int);
 	void UpdateOil(int, int);

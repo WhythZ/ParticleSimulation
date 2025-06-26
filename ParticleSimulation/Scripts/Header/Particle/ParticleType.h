@@ -7,27 +7,28 @@
 //指定底层类型uint8_t使得Particle类成员ParticleType仅占用1字节空间
 enum class ParticleType : uint8_t
 {
-	EMPTY,      //空
+	EMPTY = 0,      //空
 
-	DIRT,       //土
-	STONE,      //岩
-	WOOD,       //木
-	ICE,        //冰
+	DIRT = 1,       //泥土
+	STONE = 2,      //岩石
+	WOOD = 3,       //木头
+	ICE = 4,        //冰
 
-	SAND,       //沙
-	SNOW,       //雪
-	GUNPOWDER,  //药
-	SALT,       //盐
+	SAND = 5,       //沙
+	SNOW = 6,       //雪
+	GUNPOWDER = 7,  //火药
 
-	WATER,      //水
-	OIL,        //油
-	ACID,       //酸
-	LAVA,       //熔
+	WATER = 8,      //水
+	OIL = 9,        //油
+	ACID = 10,      //酸液
+	LAVA = 11,      //岩浆
 
-	FIRE,       //火
+	FIRE = 12,      //火
 
-	SMOKE,      //烟
-	STEAM       //汽
+	SMOKE = 13,     //烟
+	STEAM = 14,     //蒸汽
+
+	COUNT = 15      //表示枚举数量
 };
 
 #endif

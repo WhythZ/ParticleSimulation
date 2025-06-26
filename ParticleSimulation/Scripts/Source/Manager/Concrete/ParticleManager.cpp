@@ -22,30 +22,6 @@ ParticleManager::ParticleManager()
 
     //清空以初始化
     ClearParticles();
-
-    #pragma region SetParticleColorMapping
-    particleColors[ParticleType::EMPTY] = { 0, 0, 0, 0 };
-
-    particleColors[ParticleType::DIRT] = { 120, 120, 120, 255 };      //得改
-    particleColors[ParticleType::STONE] = { 120, 120, 120, 255 };
-    particleColors[ParticleType::WOOD] = { 150, 111, 51, 255 };
-    particleColors[ParticleType::ICE] = { 120, 120, 120, 255 };       //得改
-    
-    particleColors[ParticleType::SAND] = { 194, 178, 128, 255 };
-    particleColors[ParticleType::SNOW] = { 194, 178, 128, 255 };      //得改
-    particleColors[ParticleType::GUNPOWDER] = { 194, 178, 128, 255 }; //得改
-    particleColors[ParticleType::SALT] = { 194, 178, 128, 255 };      //得改
-    
-    particleColors[ParticleType::WATER] = { 64, 164, 223, 200 };
-    particleColors[ParticleType::OIL] = { 64, 164, 223, 200 };        //得改
-    particleColors[ParticleType::ACID] = { 50, 255, 50, 200 };
-    particleColors[ParticleType::LAVA] = { 207, 16, 32, 255 };
-    
-    particleColors[ParticleType::FIRE] = { 255, 69, 0, 255 };
-    
-    particleColors[ParticleType::SMOKE] = { 100, 100, 100, 180 };
-    particleColors[ParticleType::STEAM] = { 100, 100, 100, 180 };     //得改
-    #pragma endregion
 }
 
 ParticleManager::~ParticleManager()
@@ -80,7 +56,6 @@ void ParticleManager::OnUpdate(double _delta)
             case ParticleType::SAND: UpdateSand(_x, _y); break;
             case ParticleType::SNOW: UpdateSnow(_x, _y); break;
             case ParticleType::GUNPOWDER: UpdateGunPowder(_x, _y); break;
-            case ParticleType::SALT: UpdateSalt(_x, _y); break;
             case ParticleType::WATER: UpdateWater(_x, _y); break;
             case ParticleType::OIL: UpdateOil(_x, _y); break;
             case ParticleType::ACID: UpdateAcid(_x, _y); break;
@@ -239,10 +214,6 @@ void ParticleManager::UpdateSnow(int _x, int _y)
 }
 
 void ParticleManager::UpdateGunPowder(int _x, int _y)
-{
-}
-
-void ParticleManager::UpdateSalt(int _x, int _y)
 {
 }
 

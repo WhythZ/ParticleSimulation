@@ -5,224 +5,48 @@
 
 #include "../../../Header/Manager/Concrete/GameManager.h"
 #include "../../../Header/Manager/Concrete/ParticleManager.h"
+#include "../../../Header/UIWidget/Concrete/UIW_ParticleBrushControl.h"
 
 UIManager::UIManager()
 {
+	//初始化UI组件
+	uiWidgets.emplace_back(new UIW_ParticleBrushControl());
 }
 
 UIManager::~UIManager()
 {
+    //释放每个UI组件的内存
+	for (UIWidget* _widget : uiWidgets)
+		delete _widget;
 }
 
 void UIManager::OnInput(const SDL_Event& _event)
 {
-    static GameManager& _gm = GameManager::Instance();
-    SDL_Point _cursorPosition = _gm.cursorPosition;
+    //鼠标指针移动事件
+    if (_event.type == SDL_MOUSEMOTION)
+    {
+        //获取鼠标指针坐标
+        cursorPosition.x = _event.motion.x;
+        cursorPosition.y = _event.motion.y;
+    }
 
-    switch (_event.type)
-    {
-    case SDL_MOUSEBUTTONDOWN:
-    {
-        if (_event.button.button == SDL_BUTTON_LEFT)
-        {
-            leftMouseDown = true;
-            //检查是否点击了UI区域
-            if (!SDL_PointInRect(&_cursorPosition, &particleSelectorRect))
-                DrawParticles(_cursorPosition.x, _cursorPosition.y, selectedParticle, brushSize);
-        }
-        else if (_event.button.button == SDL_BUTTON_RIGHT)
-        {
-            rightMouseDown = true;
-            EraseParticles(_cursorPosition.x, _cursorPosition.y, brushSize);
-        }
-    }
-        break;
-    case SDL_MOUSEBUTTONUP:
-    {
-        if (_event.button.button == SDL_BUTTON_LEFT)
-            leftMouseDown = false;
-        else if (_event.button.button == SDL_BUTTON_RIGHT)
-            rightMouseDown = false;
-    }
-        break;
-    case SDL_MOUSEMOTION:
-    {
-        //在鼠标移动路径上绘制粒子
-        if (leftMouseDown && !SDL_PointInRect(&_cursorPosition, &particleSelectorRect))
-            DrawParticles(_cursorPosition.x, _cursorPosition.y, selectedParticle, brushSize);
-        //在鼠标移动路径上擦除粒子
-        else if (rightMouseDown)
-            EraseParticles(_cursorPosition.x, _cursorPosition.y, brushSize);
-        lastMousePos = _cursorPosition;
-    }
-        break;
-    case SDL_MOUSEWHEEL:
-    {
-        //鼠标滚轮调整画笔大小
-        if (_event.wheel.y > 0)
-            brushSize = std::min(brushSize + 1, 20);
-        else if (_event.wheel.y < 0)
-            brushSize = std::max(brushSize - 1, 1);
-    }
-        break;
-    case SDL_KEYDOWN:
-    {
-        //键盘快捷键切换粒子类型
-        //switch (_event.key.keysym.sym)
-        //{
-        //case SDLK_1: selectedParticle = ParticleType::; break;
-        //case SDLK_2: selectedParticle = ParticleType::; break;
-        //default: break;
-        //}
-    }
-        break;
-    default:
-        break;
-    }
+    //更新每个UI组件
+    for (UIWidget* _widget : uiWidgets)
+        _widget->OnInput(_event);
 }
 
 void UIManager::OnUpdate(SDL_Renderer* _renderer)
 {
+    //更新每个UI组件
+	for (UIWidget* _widget : uiWidgets)
+		_widget->OnUpdate(_renderer);
 }
 
 void UIManager::OnRender(SDL_Renderer* _renderer)
 {
-    static auto& _particleColors = ParticleManager::Instance().particleColors;
-    static GameManager& _gm = GameManager::Instance();
-    SDL_Point _cursorPosition = _gm.cursorPosition;
-
-    //绘制UI元素
-    DrawParticleSelector(_renderer);
-    DrawBrushSizeControl(_renderer);
-
-    //在鼠标位置绘制画笔预览
-    SDL_Color previewColor = _particleColors[selectedParticle];
-    //半透明预览
-    previewColor.a = 100;
-
-    if (brushSize > 1)
-    {
-        //绘制画笔圆圈
-        aacircleRGBA(_renderer, _cursorPosition.x, _cursorPosition.y, brushSize,
-            previewColor.r, previewColor.g, previewColor.b, previewColor.a);
-    }
-    else
-    {
-        //绘制单个像素点
-        SDL_SetRenderDrawColor(_renderer, previewColor.r, previewColor.g, previewColor.b, previewColor.a);
-        SDL_RenderDrawPoint(_renderer, _cursorPosition.x, _cursorPosition.y);
-    }
-}
-
-void UIManager::DrawParticles(int _centerX, int _centerY, ParticleType _type, int _radius)
-{
-    static ParticleManager& _pm = ParticleManager::Instance();
-    static auto& _particleColors = _pm.particleColors;
-
-    //计算影响区域
-    int _minX = std::max(0, _centerX - _radius);
-    int _maxX = std::min(GameManager::Instance().windowRect.w - 1, _centerX + _radius);
-    int _minY = std::max(0, _centerY - _radius);
-    int _maxY = std::min(GameManager::Instance().windowRect.h - 1, _centerY + _radius);
-
-    //在圆形区域内添加粒子
-    for (int _y = _minY; _y <= _maxY; _y++)
-    {
-        for (int _x = _minX; _x <= _maxX; _x++)
-        {
-            //计算点到圆心的距离
-            double _dist = std::sqrt((_x - _centerX) * (_x - _centerX) + (_y - _centerY) * (_y - _centerY));
-
-            //如果在圆内，添加粒子
-            if (_dist <= _radius)
-            {
-                //根据距离中心的位置增加一些随机性
-                if (_dist < _radius * 0.7 || (rand() % 100) < 70)
-                    _pm.AddParticle(_x, _y, _type);
-            }
-        }
-    }
-}
-
-void UIManager::EraseParticles(int _centerX, int _centerY, int _radius)
-{
-    static ParticleManager& _pm = ParticleManager::Instance();
-
-    //计算影响区域
-    int _minX = std::max(0, _centerX - _radius);
-    int _maxX = std::min(GameManager::Instance().windowRect.w - 1, _centerX + _radius);
-    int _minY = std::max(0, _centerY - _radius);
-    int _maxY = std::min(GameManager::Instance().windowRect.h - 1, _centerY + _radius);
-
-    //在圆形区域内擦除粒子
-    for (int _y = _minY; _y <= _maxY; _y++)
-    {
-        for (int _x = _minX; _x <= _maxX; _x++)
-        {
-            //计算点到圆心的距离
-            double _dist = std::sqrt((_x - _centerX) * (_x - _centerX) + (_y - _centerY) * (_y - _centerY));
-
-            //如果在圆内，擦除粒子
-            if (_dist <= _radius)
-                _pm.RemoveParticle(_x, _y);
-        }
-    }
-}
-
-void UIManager::DrawParticleSelector(SDL_Renderer* _renderer)
-{
-    static ParticleManager& _pm = ParticleManager::Instance();
-    static auto& _particleColors = _pm.particleColors;
-
-    //绘制选择器背景
-    DrawBox(_renderer, { particleSelectorRect.x, particleSelectorRect.y },
-        { particleSelectorRect.w, particleSelectorRect.h }, { 50, 50, 50, 200 });
-
-    //绘制可选择的粒子类型
-    const std::vector<ParticleType> types =
-    {
-        ParticleType::DIRT, ParticleType::STONE, ParticleType::WOOD, ParticleType::ICE,
-        ParticleType::SAND, ParticleType::SNOW, ParticleType::GUNPOWDER, ParticleType::SALT,
-        ParticleType::WATER, ParticleType::OIL, ParticleType::ACID, ParticleType::LAVA,
-        ParticleType::FIRE, ParticleType::SMOKE, ParticleType::STEAM
-    };
-
-    int _buttonSize = 30;
-    int _margin = 5;
-    int _startX = particleSelectorRect.x + _margin;
-    int _startY = particleSelectorRect.y + _margin;
-
-    for (size_t _i = 0; _i < types.size(); _i++)
-    {
-        int x = _startX + _i * (_buttonSize + _margin);
-        int y = _startY;
-
-        SDL_Color color = _particleColors[types[_i]];
-
-        //绘制粒子按钮
-        DrawBox(_renderer, { x, y }, { _buttonSize, _buttonSize }, color);
-
-        //若是当前选中的粒子，绘制2像素厚的边框
-        if (types[_i] == selectedParticle)
-            DrawBorder(_renderer, { x, y }, { _buttonSize, _buttonSize }, 2, { 255, 255, 255, 255 });
-    }
-}
-
-void UIManager::DrawBrushSizeControl(SDL_Renderer* _renderer)
-{
-    //绘制背景
-    DrawBox(_renderer, { brushSizeRect.x, brushSizeRect.y },
-        { brushSizeRect.w, brushSizeRect.h }, { 50, 50, 50, 200 });
-
-    //绘制画笔大小指示器
-    SDL_Color indicatorColor = { 200, 200, 200, 255 };
-    int indicatorWidth = brushSize * 5;
-    int indicatorX = brushSizeRect.x + (brushSizeRect.w - indicatorWidth) / 2;
-    int indicatorY = brushSizeRect.y + (brushSizeRect.h - 10) / 2;
-
-    DrawBox(_renderer, { indicatorX, indicatorY }, { indicatorWidth, 10 }, indicatorColor);
-
-    //绘制文本提示，待补充
+    //更新每个UI组件
+    for (UIWidget* _widget : uiWidgets)
+        _widget->OnRender(_renderer);
 }
 
 #pragma region BasicShapes
@@ -301,5 +125,31 @@ void UIManager::DrawBorder(SDL_Renderer* _renderer, const SDL_Point& _LeftUpPosi
 
     //绘制四个边框矩形
     SDL_RenderFillRects(_renderer, borderRects, 4);
+}
+
+void UIManager::DrawDynamicBar(SDL_Renderer* _renderer, const SDL_Point& _LeftUpPosition, const SDL_Point& _size, int _borderThickness,
+    const SDL_Color& _backgroundColor, const SDL_Color& _contentColor, double _contentRatio)
+{
+    static SDL_Rect _dstRect;
+
+    //先规整传入的比例，控制在[0,1]之间
+    double _ratio = (_contentRatio < 0) ? 0 : _contentRatio;
+    _ratio = (_ratio > 1) ? 1 : _ratio;
+
+    //数值值条先绘制背景颜色填充，再绘制内容颜色填充，先传入渲染器与左上顶点和右下顶点，然后是颜色
+    _dstRect = { _LeftUpPosition.x, _LeftUpPosition.y, _size.x, _size.y };
+    boxRGBA(_renderer, _dstRect.x, _dstRect.y, _dstRect.x + _dstRect.w, _dstRect.y + _dstRect.h,
+        _backgroundColor.r, _backgroundColor.g, _backgroundColor.b, _backgroundColor.a);
+    //如果是如下绘制圆角矩形，则还需传入圆角半径
+    //roundedBoxRGBA(_renderer, _dstRect.x, _dstRect.y, _dstRect.x + _dstRect.w, _dstRect.y + _dstRect.h,
+    //	4, _backgroundColor.r, _backgroundColor.g, _backgroundColor.b, _backgroundColor.a);
+
+    //绘制内容的填充矩形（其水平宽度按照比例实时更新），其依据边框宽度收窄，背景颜色就相当于在内容颜色的外围形成一圈边框
+    _dstRect = { _LeftUpPosition.x + _borderThickness, _LeftUpPosition.y + _borderThickness,
+        (int)((_size.x - 2 * _borderThickness) * _ratio), _size.y - 2 * _borderThickness };
+    boxRGBA(_renderer, _dstRect.x, _dstRect.y, _dstRect.x + _dstRect.w, _dstRect.y + _dstRect.h,
+        _contentColor.r, _contentColor.g, _contentColor.b, _contentColor.a);
+    //roundedBoxRGBA(_renderer, _dstRect.x, _dstRect.y, _dstRect.x + _dstRect.w, _dstRect.y + _dstRect.h,
+    //	4, _contentColor.r, _contentColor.g, _contentColor.b, _contentColor.a);
 }
 #pragma endregion

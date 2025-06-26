@@ -11,7 +11,6 @@ class GameManager :public Manager<GameManager>
 
 public:
 	SDL_Rect windowRect;                       //游戏窗口矩形区域
-	SDL_Point cursorPosition = { 0,0 };        //鼠标指针坐标
 
 private:
 	SDL_Window* window = nullptr;              //游戏主窗口

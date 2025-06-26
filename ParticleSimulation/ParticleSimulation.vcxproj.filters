@@ -19,12 +19,6 @@
     <Filter Include="头文件\Manager\Concrete">
       <UniqueIdentifier>{20c47497-d572-4d73-8748-7bcdf4d3d2f6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\Manager">
-      <UniqueIdentifier>{b4fc6e88-38d7-4a68-9e73-a84b0617e48e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="源文件\Manager\Concrete">
-      <UniqueIdentifier>{7eaac0d2-1109-4525-81c0-ece86886bffe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="头文件\Particle">
       <UniqueIdentifier>{43e033ad-f116-4a6d-8578-23e54770f038}</UniqueIdentifier>
     </Filter>
@@ -33,6 +27,24 @@
     </Filter>
     <Filter Include="源文件\Infrastructure">
       <UniqueIdentifier>{528623ed-226a-479a-b31d-7ca65cb01eda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\UIWidget">
+      <UniqueIdentifier>{472bbbd1-0657-465e-8c72-8f58ea876ecc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\UIWidget">
+      <UniqueIdentifier>{b7b4eb23-9077-4863-85ab-b240cf2a94db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\UIWidget\Concrete">
+      <UniqueIdentifier>{79571379-68c5-4e4a-82c7-067b5716d9e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\UIWidget\Concrete">
+      <UniqueIdentifier>{e6d3c2c3-db8a-4c46-a8d0-c3207b3abb13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Manager">
+      <UniqueIdentifier>{b4fc6e88-38d7-4a68-9e73-a84b0617e48e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\Manager\Concrete">
+      <UniqueIdentifier>{7eaac0d2-1109-4525-81c0-ece86886bffe}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -56,6 +68,12 @@
     </ClCompile>
     <ClCompile Include="Scripts\Source\Manager\Concrete\UIManager.cpp">
       <Filter>源文件\Manager\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Source\UIWidget\Concrete\UIW_ParticleBrushControl.cpp">
+      <Filter>源文件\UIWidget\Concrete</Filter>
+    </ClCompile>
+    <ClCompile Include="Scripts\Source\UIWidget\UIWidget.cpp">
+      <Filter>源文件\UIWidget</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -83,8 +101,14 @@
     <ClInclude Include="Scripts\Header\Manager\Concrete\UIManager.h">
       <Filter>头文件\Manager\Concrete</Filter>
     </ClInclude>
+    <ClInclude Include="Scripts\Header\UIWidget\Concrete\UIW_ParticleBrushControl.h">
+      <Filter>头文件\UIWidget\Concrete</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Header\UIWidget\UIWidget.h">
+      <Filter>头文件\UIWidget</Filter>
+    </ClInclude>
     <ClInclude Include="Scripts\Header\Particle\ParticleType.h">
-      <Filter>头文件</Filter>
+      <Filter>头文件\Particle</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

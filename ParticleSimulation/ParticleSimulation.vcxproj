@@ -140,6 +140,8 @@
     <ClCompile Include="Scripts\Source\Manager\Concrete\ParticleManager.cpp" />
     <ClCompile Include="Scripts\Source\Manager\Concrete\ResourceManager.cpp" />
     <ClCompile Include="Scripts\Source\Manager\Concrete\UIManager.cpp" />
+    <ClCompile Include="Scripts\Source\UIWidget\Concrete\UIW_ParticleBrushControl.cpp" />
+    <ClCompile Include="Scripts\Source\UIWidget\UIWidget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scripts\Header\Infrastructure\Timer.h" />
@@ -151,6 +153,8 @@
     <ClInclude Include="Scripts\Header\Manager\Concrete\ResourceManager.h" />
     <ClInclude Include="Scripts\Header\Manager\Manager.hpp" />
     <ClInclude Include="Scripts\Header\Particle\ParticleType.h" />
+    <ClInclude Include="Scripts\Header\UIWidget\Concrete\UIW_ParticleBrushControl.h" />
+    <ClInclude Include="Scripts\Header\UIWidget\UIWidget.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
