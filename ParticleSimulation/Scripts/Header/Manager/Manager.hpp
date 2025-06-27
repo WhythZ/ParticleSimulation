@@ -6,7 +6,9 @@ template <typename M>
 class Manager
 {
 public:
-	static M& Instance();                          //获取单例实例引用
+	//获取单例实例引用
+	//此处懒汉实现保证了GameManager最先初始化，以确保其它依赖于GameManager的管理器在其后初始化
+	static M& Instance();
 
 protected:
 	Manager() = default;

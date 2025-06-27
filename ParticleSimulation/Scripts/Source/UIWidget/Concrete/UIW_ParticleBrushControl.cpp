@@ -282,11 +282,7 @@ void UIW_ParticleBrushControl::DrawParticles(int _centerX, int _centerY, Particl
 
             //如果在圆内，添加粒子
             if (_dist <= _radius)
-            {
-                //根据距离中心的位置增加一些随机性
-                if (_dist < _radius * 0.7 || (rand() % 100) < 70)
-                    _pm.AddParticle(_x, _y, _type);
-            }
+                _pm.AddParticle(_x, _y, _type);
         }
     }
 }

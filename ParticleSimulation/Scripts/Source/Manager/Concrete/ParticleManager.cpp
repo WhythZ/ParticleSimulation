@@ -13,15 +13,16 @@ ParticleManager::ParticleManager()
     rng = std::mt19937(_rd());
     #pragma endregion
 
-    #pragma region DoubleBuffer
-    //分配双缓冲内存
+	//获取游戏窗口矩形区域
     windowRect = GameManager::Instance().windowRect;
+    
+    #pragma region DoubleBuffer
+    //分配双缓冲内存，堆区线性数组
     frontBuffer = new Particle[windowRect.w * windowRect.h];
     backBuffer = new Particle[windowRect.w * windowRect.h];
+	//以EMPTY粒子填充整个前缓冲和后缓冲
+    ClearAllParticles();
     #pragma endregion
-
-    //清空以初始化
-    ClearParticles();
 }
 
 ParticleManager::~ParticleManager()
@@ -33,7 +34,7 @@ ParticleManager::~ParticleManager()
 
 void ParticleManager::OnUpdate(double _delta)
 {   
-    //重置后缓冲
+    //重置后缓冲，等待写入更新结果
     std::fill_n(backBuffer, windowRect.w * windowRect.h, Particle{});
 
     //每个像素点代表一个粒子，遍历屏幕像素点更新粒子状态，从底部向上更新避免更新顺序影响物理效果
@@ -41,14 +42,14 @@ void ParticleManager::OnUpdate(double _delta)
     {
         for (int _x = 0; _x < windowRect.w; _x++)
         {
+			//从前缓冲区获取粒子，将更新结果写入后缓冲区
             Particle& _particle = frontBuffer[_y * windowRect.w + _x];
-
-            if (_particle.type == ParticleType::EMPTY) continue;
 
             //根据粒子类型调用更新函数
             switch (_particle.type)
             {
-            case ParticleType::EMPTY: UpdateEmpty(_x, _y); break;
+            //遇到空类型则直接跳过
+			case ParticleType::EMPTY: continue;
             case ParticleType::DIRT: UpdateDirt(_x, _y); break;
             case ParticleType::STONE: UpdateStone(_x, _y); break;
             case ParticleType::WOOD: UpdateWood(_x, _y); break;
@@ -63,13 +64,12 @@ void ParticleManager::OnUpdate(double _delta)
             case ParticleType::FIRE: UpdateFire(_x, _y); break;
             case ParticleType::SMOKE: UpdateSmoke(_x, _y); break;
             case ParticleType::STEAM: UpdateSteam(_x, _y); break;
-            //其他粒子类型保持原位
-            default: backBuffer[_y * windowRect.w + _x] = _particle; break;
+            default: break;
             }
         }
     }
-    //交换缓冲区
-    SwapBuffers();
+	//交换缓冲区，将后缓冲区的更新结果作为前缓冲区的状态
+    std::swap(frontBuffer, backBuffer);
 }
 
 void ParticleManager::OnRender(SDL_Renderer* _renderer)
@@ -121,19 +121,15 @@ void ParticleManager::RemoveParticle(int _x, int _y)
         frontBuffer[_y * windowRect.w + _x] = Particle{};
 }
 
-void ParticleManager::ClearParticles()
+void ParticleManager::ClearAllParticles()
 {
     std::fill_n(frontBuffer, windowRect.w * windowRect.h, Particle{});
     std::fill_n(backBuffer, windowRect.w * windowRect.h, Particle{});
 }
 
-void ParticleManager::SwapBuffers()
-{
-    std::swap(frontBuffer, backBuffer);
-}
-
 Particle ParticleManager::GetParticle(int _x, int _y) const
 {
+	//获取指定位置的粒子对象，如果位置无效则返回空粒子
     if (IsValidPosition(_x, _y))
         return frontBuffer[_y * windowRect.w + _x];
     return Particle{};
@@ -141,14 +137,12 @@ Particle ParticleManager::GetParticle(int _x, int _y) const
 
 bool ParticleManager::IsValidPosition(int _x, int _y) const
 {
-    return _x >= 0 && _x < windowRect.w && _y >= 0 && _y < windowRect.h;
+	//检查坐标是否在窗口范围内
+    return (_x >= windowRect.x && _x < windowRect.x + windowRect.w)
+        && (_y >= windowRect.y && _y < windowRect.y + windowRect.h);
 }
 
 #pragma region UpdateSpecificParticleType
-void ParticleManager::UpdateEmpty(int _x, int _y)
-{
-}
-
 void ParticleManager::UpdateDirt(int _x, int _y)
 {
 }
@@ -180,10 +174,9 @@ void ParticleManager::UpdateSand(int _x, int _y)
         }
     }
 
-    //随机选择先左还是先右
+    //随机选择先左下方还是先右下方
     int dir = dist(rng) ? 1 : -1;
-
-    //尝试左下/右下移动
+    //尝试朝斜下方移动
     if (IsValidPosition(_x + dir, _y + 1))
     {
         Particle& diag = backBuffer[(_y + 1) * windowRect.w + _x + dir];
@@ -193,7 +186,6 @@ void ParticleManager::UpdateSand(int _x, int _y)
             return;
         }
     }
-
     //尝试另一个对角线
     if (IsValidPosition(_x - dir, _y + 1))
     {

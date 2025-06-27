@@ -26,25 +26,21 @@ private:
 	#pragma endregion
 
 public:
-	void OnUpdate(double);
+	void OnUpdate(double);                            //双缓冲更新屏幕画面
 	void OnRender(SDL_Renderer*);
 
 	void AddParticle(int, int, ParticleType);
 	void RemoveParticle(int, int);
-	void ClearParticles();
+	void ClearAllParticles();
 
 private:
 	ParticleManager();
 	~ParticleManager();
 
-	void SwapBuffers();                               //交换双缓冲
-
-	Particle GetParticle(int, int) const;
-	bool IsValidPosition(int, int) const;             //检查位置是否有效
+	Particle GetParticle(int, int) const;             //获取坐标位置的粒子对象引用
+	bool IsValidPosition(int, int) const;             //检查坐标是否在游戏窗口内部
 
 	#pragma region UpdateSpecificParticleType
-	void UpdateEmpty(int, int);
-
 	void UpdateDirt(int, int);
 	void UpdateStone(int, int);
 	void UpdateWood(int, int);
