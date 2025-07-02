@@ -73,7 +73,8 @@ const FontPool& ResourceManager::GetFontPool()
 bool ResourceManager::LoadFontRes()
 {
 	//从文件中加载字体
-	fontPool[FontResID::Ipix] = TTF_OpenFont("Assets/Fonts/Ipix.ttf", 25);
+	fontPool[FontResID::FusionPixel_12px_EN] = TTF_OpenFont("Assets/Fonts/fusion-pixel-12px-proportional-latin.ttf", 24);
+	fontPool[FontResID::FusionPixel_12px_CN] = TTF_OpenFont("Assets/Fonts/fusion-pixel-12px-proportional-zh_hans.ttf", 24);
 
 	//检查unordered_map容器中所有键值对的值是否有效；其中auto是自动类型推导，成员second访问的是键值对的值
 	for (const auto& _pair : fontPool)

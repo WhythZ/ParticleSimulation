@@ -187,7 +187,7 @@ void UIW_ParticleBrushControl::OnUpdate(SDL_Renderer* _renderer)
 
     #pragma region ParticleTypeText
     //先将文本以特定字体加载到内存中
-    static TTF_Font* _font = ResourceManager::Instance().GetFontPool().find(FontResID::Ipix)->second;
+    static TTF_Font* _font = ResourceManager::Instance().GetFontPool().find(FontResID::FusionPixel_12px_EN)->second;
     SDL_Surface* _ptTextSurface = TTF_RenderText_Blended(_font,
         particleNames[selectedParticleType].c_str(), particleTypeTextColor);
     //获取转化后的图片的长宽

@@ -15,7 +15,8 @@
 
 enum class FontResID
 {
-	Ipix
+	FusionPixel_12px_EN,
+	FusionPixel_12px_CN
 };
 
 //typedef std::unordered_map<TextureResID, SDL_Texture*> TexturePool;
