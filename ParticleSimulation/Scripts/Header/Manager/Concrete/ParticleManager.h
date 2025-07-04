@@ -41,29 +41,35 @@ private:
 	ParticleManager();
 	~ParticleManager();
 
-	void UpdateParticle(int, int);
+	inline void UpdateParticle(int, int);
 
-	bool IsValidPosition(int, int) const;             //检查坐标是否在窗口范围内
+	inline bool IsValidPosition(int, int) const;      //检查坐标是否在窗口范围内
 
-	#pragma region UpdateSpecificParticleType
-	//void UpdateEmpty(int, int);
-
+	#pragma region UpdateSolid
 	void UpdateDirt(int, int);
 	void UpdateStone(int, int);
 	void UpdateWood(int, int);
 	void UpdateIce(int, int);
+	#pragma endregion
 
+	#pragma region UpdateFluid
 	void UpdateSand(int, int);
 	void UpdateSnow(int, int);
 	void UpdateGunPowder(int, int);
+	#pragma endregion
 
+	#pragma region UpdateLiquid
 	void UpdateWater(int, int);
 	void UpdateOil(int, int);
 	void UpdateAcid(int, int);
 	void UpdateLava(int, int);
+	#pragma endregion
 
+	#pragma region UpdateSpread
 	void UpdateFire(int, int);
+	#pragma endregion
 
+	#pragma region UpdateGas
 	void UpdateSmoke(int, int);
 	void UpdateSteam(int, int);
 	#pragma endregion

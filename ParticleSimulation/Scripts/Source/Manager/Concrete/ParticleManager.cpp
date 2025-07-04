@@ -151,7 +151,7 @@ bool ParticleManager::IsValidPosition(int _x, int _y) const
 	//若后续需实现更复杂的瓦片（如n*n个像素点代表一个粒子瓦片），则需注意进行坐标的转换
 }
 
-#pragma region UpdateSpecificParticleType
+#pragma region UpdateSolid
 void ParticleManager::UpdateDirt(int _x, int _y)
 {
     //位置固定不动
@@ -175,55 +175,65 @@ void ParticleManager::UpdateIce(int _x, int _y)
     //位置固定不动
     backBuffer[_y * windowRect.w + _x].type = ParticleType::ICE;
 }
+#pragma endregion
 
+#pragma region UpdateFluid
 void ParticleManager::UpdateSand(int _x, int _y)
 {
+    //缓存常用值
+    int _currentIdx = _y * windowRect.w + _x;
+    ParticleType _currentType = ParticleType::SAND;
+
+    #pragma region Below
     //尝试向下移动
     if (IsValidPosition(_x, _y + 1))
     {
-        Particle& _below = backBuffer[(_y + 1) * windowRect.w + _x];
-        if (_below.type == ParticleType::EMPTY)
+        int _belowIdx = (_y + 1) * windowRect.w + _x;
+        if (backBuffer[_belowIdx].type == ParticleType::EMPTY)
         {
             //先清空当前位置
-            backBuffer[_y * windowRect.w + _x].type = ParticleType::EMPTY;
-			//向下方下落，将其粒子类型设置为沙子
-            backBuffer[(_y + 1) * windowRect.w + _x].type = ParticleType::SAND;
+            backBuffer[_currentIdx].type = ParticleType::EMPTY;
+			//向下方下落，将其粒子类型替换
+            backBuffer[_belowIdx].type = _currentType;
             return;
         }
     }
+    #pragma endregion
 
-    //随机选择先左下方还是先右下方
+    //随机选择先左还是先右
     int _dir = dist(rng) ? 1 : -1;
-
+    
+    #pragma region Diagonal
     //尝试朝斜下方移动
     if (IsValidPosition(_x + _dir, _y + 1))
     {
-        Particle& _diag = backBuffer[(_y + 1) * windowRect.w + (_x + _dir)];
-        if (_diag.type == ParticleType::EMPTY)
+		int _diagIdx = (_y + 1) * windowRect.w + (_x + _dir);
+        if (backBuffer[_diagIdx].type == ParticleType::EMPTY)
         {
             //先清空当前位置
-            backBuffer[_y * windowRect.w + _x].type = ParticleType::EMPTY;
-            //向斜下方下落，将其粒子类型设置为沙子
-            backBuffer[(_y + 1) * windowRect.w + (_x + _dir)].type = ParticleType::SAND;
+            backBuffer[_currentIdx].type = ParticleType::EMPTY;
+            //向斜下方下落，将其粒子类型替换
+            backBuffer[_diagIdx].type = _currentType;
             return;
         }
     }
     //尝试另一个对角线
     if (IsValidPosition(_x - _dir, _y + 1))
     {
-        Particle& diag = backBuffer[(_y + 1) * windowRect.w + (_x - _dir)];
-        if (diag.type == ParticleType::EMPTY)
+        int _diagIdx = (_y + 1) * windowRect.w + (_x - _dir);
+        if (backBuffer[_diagIdx].type == ParticleType::EMPTY)
         {
             //先清空当前位置
-			backBuffer[_y * windowRect.w + _x].type = ParticleType::EMPTY;
-            //向斜下方下落，将其粒子类型设置为沙子
-            backBuffer[(_y + 1) * windowRect.w + (_x - _dir)].type = ParticleType::SAND;
+			backBuffer[_currentIdx].type = ParticleType::EMPTY;
+            //向斜下方下落，将其粒子类型替换
+            backBuffer[_diagIdx].type = _currentType;
             return;
         }
     }
+    #pragma endregion
 
     //无法移动，保持原位
-    backBuffer[_y * windowRect.w + _x].type = ParticleType::SAND;
+    backBuffer[_currentIdx].type = _currentType;
 }
 
 void ParticleManager::UpdateSnow(int _x, int _y)
@@ -233,9 +243,93 @@ void ParticleManager::UpdateSnow(int _x, int _y)
 void ParticleManager::UpdateGunPowder(int _x, int _y)
 {
 }
+#pragma endregion
 
+#pragma region UpdateLiquid
 void ParticleManager::UpdateWater(int _x, int _y)
 {
+    //缓存常用值
+    int _currentIdx = _y * windowRect.w + _x;
+    ParticleType _currentType = ParticleType::WATER;
+
+    #pragma region Below
+    //尝试向下移动
+    if (IsValidPosition(_x, _y + 1))
+    {
+        int _belowIdx = (_y + 1) * windowRect.w + _x;
+        if (backBuffer[_belowIdx].type == ParticleType::EMPTY)
+        {
+            //先清空当前位置
+            backBuffer[_currentIdx].type = ParticleType::EMPTY;
+            //向下方下落，将其粒子类型替换
+            backBuffer[_belowIdx].type = _currentType;
+            return;
+        }
+    }
+    #pragma endregion
+
+    //随机选择先左还是先右
+    int _dir = dist(rng) ? 1 : -1;
+
+    #pragma region Diagonal
+    //尝试朝斜下方移动
+    if (IsValidPosition(_x + _dir, _y + 1))
+    {
+        int _diagIdx = (_y + 1) * windowRect.w + (_x + _dir);
+        if (backBuffer[_diagIdx].type == ParticleType::EMPTY)
+        {
+            //先清空当前位置
+            backBuffer[_currentIdx].type = ParticleType::EMPTY;
+            //向斜下方下落，将其粒子类型替换
+            backBuffer[_diagIdx].type = _currentType;
+            return;
+        }
+    }
+    //尝试另一个对角线
+    if (IsValidPosition(_x - _dir, _y + 1))
+    {
+        int _diagIdx = (_y + 1) * windowRect.w + (_x - _dir);
+        if (backBuffer[_diagIdx].type == ParticleType::EMPTY)
+        {
+            //先清空当前位置
+            backBuffer[_currentIdx].type = ParticleType::EMPTY;
+            //向斜下方下落，将其粒子类型替换
+            backBuffer[_diagIdx].type = _currentType;
+            return;
+        }
+    }
+    #pragma endregion
+
+    #pragma region Horizontal
+    //液体还可以向左右移动，但问题时此处逻辑会导致粒子在同一帧内被多次处理
+    if (IsValidPosition(_x + _dir, _y))
+    {
+        int _horiIdx = _y * windowRect.w + (_x + _dir);
+        if (backBuffer[_horiIdx].type == ParticleType::EMPTY)
+        {
+            //先清空当前位置
+            backBuffer[_currentIdx].type = ParticleType::EMPTY;
+            //向水平方向移动
+            backBuffer[_horiIdx].type = _currentType;
+            return;
+        }
+    }
+    if (IsValidPosition(_x - _dir, _y))
+    {
+        int _horiIdx = _y * windowRect.w + (_x - _dir);
+        if (backBuffer[_horiIdx].type == ParticleType::EMPTY)
+        {
+            //先清空当前位置
+            backBuffer[_currentIdx].type = ParticleType::EMPTY;
+            //向水平方向移动
+            backBuffer[_horiIdx].type = _currentType;
+            return;
+        }
+    }
+    #pragma endregion
+
+    //无法移动，保持原位
+    backBuffer[_currentIdx].type = _currentType;
 }
 
 void ParticleManager::UpdateOil(int _x, int _y)
@@ -249,11 +343,15 @@ void ParticleManager::UpdateAcid(int _x, int _y)
 void ParticleManager::UpdateLava(int _x, int _y)
 {
 }
+#pragma endregion
 
+#pragma region UpdateSpread
 void ParticleManager::UpdateFire(int _x, int _y)
 {
 }
+#pragma endregion
 
+#pragma region UpdateGas
 void ParticleManager::UpdateSmoke(int _x, int _y)
 {
 }
