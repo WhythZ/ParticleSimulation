@@ -56,33 +56,24 @@ void ParticleManager::OnUpdate(double _delta)
     //此处发送了不必要的新对象创建
     //std::fill(backBuffer.begin(), backBuffer.end(), Particle{ ParticleType::EMPTY });
 
-    //每个像素点代表一个粒子，从下向上遍历保证物理效果正确性
+    //每个像素点代表一个粒子，从下向上遍历保证物理正确
+	//奇偶行遍历方向不同，防止粒子更新始终偏向于某一方
     for (int _y = windowRect.h - 1; _y >= 0; _y--)
     {
-        for (int _x = 0; _x < windowRect.w; _x++)
-        {
-			ParticleType& _type = frontBuffer[_y * windowRect.w + _x].type;
+        //使用位运算判断奇偶性比取模运算更快
+        const bool _isSingularRow = _y & 1;
 
-            //根据前缓冲区粒子类型调用对应更新函数，更新结果均写入后缓冲区
-            switch (_type)
-            {
-			case ParticleType::EMPTY: backBuffer[_y * windowRect.w + _x] = ParticleType::EMPTY; break;
-            case ParticleType::DIRT: UpdateDirt(_x, _y); break;
-            case ParticleType::STONE: UpdateStone(_x, _y); break;
-            case ParticleType::WOOD: UpdateWood(_x, _y); break;
-            case ParticleType::ICE: UpdateIce(_x, _y); break;
-            case ParticleType::SAND: UpdateSand(_x, _y); break;
-            case ParticleType::SNOW: UpdateSnow(_x, _y); break;
-            case ParticleType::GUNPOWDER: UpdateGunPowder(_x, _y); break;
-            case ParticleType::WATER: UpdateWater(_x, _y); break;
-            case ParticleType::OIL: UpdateOil(_x, _y); break;
-            case ParticleType::ACID: UpdateAcid(_x, _y); break;
-            case ParticleType::LAVA: UpdateLava(_x, _y); break;
-            case ParticleType::FIRE: UpdateFire(_x, _y); break;
-            case ParticleType::SMOKE: UpdateSmoke(_x, _y); break;
-            case ParticleType::STEAM: UpdateSteam(_x, _y); break;
-            default: break;
-            }
+        //奇数行从左向右遍历
+        if (_isSingularRow)
+        {
+            for (int _x = 0; _x < windowRect.w; _x++)
+                UpdateParticle(_x, _y);
+        }
+        //偶数行从右向左遍历
+        else
+        {
+            for (int _x = windowRect.w - 1; _x >= 0; _x--)
+                UpdateParticle(_x, _y);
         }
     }
 	//交换缓冲区，将后缓冲区的更新结果作为前缓冲区的状态
@@ -122,6 +113,32 @@ void ParticleManager::EmptizeParticleAt(int _x, int _y)
 
     //将粒子类型置空
     frontBuffer[_y * windowRect.w + _x].type = ParticleType::EMPTY;
+}
+
+void ParticleManager::UpdateParticle(int _x, int _y)
+{
+    ParticleType& _type = frontBuffer[_y * windowRect.w + _x].type;
+
+    //根据前缓冲区粒子类型调用对应更新函数，更新结果均写入后缓冲区
+    switch (_type)
+    {
+    case ParticleType::EMPTY: backBuffer[_y * windowRect.w + _x] = ParticleType::EMPTY; break;
+    case ParticleType::DIRT: UpdateDirt(_x, _y); break;
+    case ParticleType::STONE: UpdateStone(_x, _y); break;
+    case ParticleType::WOOD: UpdateWood(_x, _y); break;
+    case ParticleType::ICE: UpdateIce(_x, _y); break;
+    case ParticleType::SAND: UpdateSand(_x, _y); break;
+    case ParticleType::SNOW: UpdateSnow(_x, _y); break;
+    case ParticleType::GUNPOWDER: UpdateGunPowder(_x, _y); break;
+    case ParticleType::WATER: UpdateWater(_x, _y); break;
+    case ParticleType::OIL: UpdateOil(_x, _y); break;
+    case ParticleType::ACID: UpdateAcid(_x, _y); break;
+    case ParticleType::LAVA: UpdateLava(_x, _y); break;
+    case ParticleType::FIRE: UpdateFire(_x, _y); break;
+    case ParticleType::SMOKE: UpdateSmoke(_x, _y); break;
+    case ParticleType::STEAM: UpdateSteam(_x, _y); break;
+    default: break;
+    }
 }
 
 bool ParticleManager::IsValidPosition(int _x, int _y) const

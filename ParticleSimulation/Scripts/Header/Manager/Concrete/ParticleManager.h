@@ -41,6 +41,8 @@ private:
 	ParticleManager();
 	~ParticleManager();
 
+	void UpdateParticle(int, int);
+
 	bool IsValidPosition(int, int) const;             //检查坐标是否在窗口范围内
 
 	#pragma region UpdateSpecificParticleType
