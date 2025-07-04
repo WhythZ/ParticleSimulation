@@ -47,10 +47,14 @@ ParticleManager::~ParticleManager()
 }
 
 void ParticleManager::OnUpdate(double _delta)
-{
-    //重置后缓冲区，注意别用resize，因其会完全重新分配内存而导致效率低下
+{    
+    //重置后缓冲区，直接修改类型为EMPTY
+    for (Particle& _p : backBuffer)
+        _p.type = ParticleType::EMPTY;
+    //使用resize会重新分配内存，效率低下
     //backBuffer.resize(windowRect.h * windowRect.w, ParticleType::EMPTY);
-    std::fill(backBuffer.begin(), backBuffer.end(), Particle{ ParticleType::EMPTY });
+    //此处发送了不必要的新对象创建
+    //std::fill(backBuffer.begin(), backBuffer.end(), Particle{ ParticleType::EMPTY });
 
     //每个像素点代表一个粒子，从下向上遍历保证物理效果正确性
     for (int _y = windowRect.h - 1; _y >= 0; _y--)
@@ -133,18 +137,26 @@ bool ParticleManager::IsValidPosition(int _x, int _y) const
 #pragma region UpdateSpecificParticleType
 void ParticleManager::UpdateDirt(int _x, int _y)
 {
+    //位置固定不动
+	backBuffer[_y * windowRect.w + _x].type = ParticleType::DIRT;
 }
 
 void ParticleManager::UpdateStone(int _x, int _y)
 {
+    //位置固定不动
+    backBuffer[_y * windowRect.w + _x].type = ParticleType::STONE;
 }
 
 void ParticleManager::UpdateWood(int _x, int _y)
 {
+    //位置固定不动
+    backBuffer[_y * windowRect.w + _x].type = ParticleType::WOOD;
 }
 
 void ParticleManager::UpdateIce(int _x, int _y)
 {
+    //位置固定不动
+    backBuffer[_y * windowRect.w + _x].type = ParticleType::ICE;
 }
 
 void ParticleManager::UpdateSand(int _x, int _y)
