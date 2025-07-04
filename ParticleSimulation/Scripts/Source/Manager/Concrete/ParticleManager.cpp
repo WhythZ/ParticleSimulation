@@ -177,7 +177,7 @@ void ParticleManager::UpdateIce(int _x, int _y)
 }
 #pragma endregion
 
-#pragma region UpdateFluid
+#pragma region UpdatePowder
 void ParticleManager::UpdateSand(int _x, int _y)
 {
     //ª∫¥Ê≥£”√÷µ

@@ -52,7 +52,7 @@ private:
 	void UpdateIce(int, int);
 	#pragma endregion
 
-	#pragma region UpdateFluid
+	#pragma region UpdatePowder
 	void UpdateSand(int, int);
 	void UpdateSnow(int, int);
 	void UpdateGunPowder(int, int);
