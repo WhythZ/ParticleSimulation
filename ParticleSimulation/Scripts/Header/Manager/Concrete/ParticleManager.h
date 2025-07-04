@@ -17,8 +17,12 @@ private:
 	SDL_Rect windowRect;                              //窗口矩形区域（从GameManager处获取）
 
 	#pragma region DoubleBuffer
-	std::vector<std::vector<Particle>> frontBuffer;   //当前帧粒子状态（双缓冲技术）
-	std::vector<std::vector<Particle>> backBuffer;    //下一帧粒子状态（双缓冲技术）
+	//这样的二维数组虽能更方便地索引，但内存连续性低导致帧率低，应转用一维数组
+	//std::vector<std::vector<Particle>> frontBuffer;
+	//std::vector<std::vector<Particle>> backBuffer;
+
+	std::vector<Particle> frontBuffer;                //当前帧粒子状态（双缓冲技术）
+	std::vector<Particle> backBuffer;                 //下一帧粒子状态（双缓冲技术）
 	#pragma endregion
 
 	#pragma region RandomEngine
@@ -32,7 +36,6 @@ public:
 
 	void SetParticleAt(int, int, ParticleType);
 	void EmptizeParticleAt(int, int);
-	void FillAllParticlesBy(ParticleType);
 
 private:
 	ParticleManager();
@@ -41,7 +44,7 @@ private:
 	bool IsValidPosition(int, int) const;             //检查坐标是否在窗口范围内
 
 	#pragma region UpdateSpecificParticleType
-	void UpdateEmpty(int, int);
+	//void UpdateEmpty(int, int);
 
 	void UpdateDirt(int, int);
 	void UpdateStone(int, int);
