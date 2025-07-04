@@ -5,6 +5,25 @@
 
 #include "../../../Header/Manager/Concrete/GameManager.h"
 
+const std::vector<SDL_Color> PARTICLE_COLORS =
+{
+    { 0, 0, 0, 0 },           //无颜色（透明）
+    { 139, 69, 19, 255 },     //深棕色
+    { 128, 128, 128, 255 },   //中灰色
+    { 150, 111, 51, 255 },    //原木色
+    { 173, 216, 230, 220 },   //淡蓝色（半透明）
+    { 194, 178, 128, 255 },   //沙黄色
+    { 240, 248, 255, 255 },   //雪白色
+    { 60, 60, 60, 255 },      //深黑色
+    { 64, 164, 223, 200 },    //天蓝色
+    { 20, 20, 20, 180 },      //亮黑色
+    { 50, 255, 50, 200 },     //荧光绿
+    { 255, 80, 0, 255 },      //亮橙色
+    { 255, 69, 0, 255 },      //橙红色
+    { 100, 100, 100, 180 },   //深灰色
+    { 210, 210, 210, 150 },   //浅灰色（半透明）
+};
+
 ParticleManager::ParticleManager()
 {
     #pragma region RandomEngine
@@ -17,39 +36,30 @@ ParticleManager::ParticleManager()
     windowRect = GameManager::Instance().windowRect;
     
     #pragma region DoubleBuffer
-    //分配双缓冲内存，堆区线性数组
-    frontBuffer = new Particle[windowRect.w * windowRect.h];
-    backBuffer = new Particle[windowRect.w * windowRect.h];
-	//以EMPTY粒子填充整个前缓冲和后缓冲
-    ClearAllParticles();
+    //初始化前后缓冲
+    frontBuffer.resize(windowRect.h, std::vector<Particle>(windowRect.w, ParticleType::EMPTY));
+    backBuffer.resize(windowRect.h, std::vector<Particle>(windowRect.w, ParticleType::EMPTY));
     #pragma endregion
 }
 
 ParticleManager::~ParticleManager()
 {
-	//释放双缓冲内存
-    delete[] frontBuffer;
-    delete[] backBuffer;
 }
 
 void ParticleManager::OnUpdate(double _delta)
-{   
-    //重置后缓冲，等待写入更新结果
-    std::fill_n(backBuffer, windowRect.w * windowRect.h, Particle{});
+{
+    //重置后缓冲区
+    backBuffer.resize(windowRect.h, std::vector<Particle>(windowRect.w, ParticleType::EMPTY));
 
-    //每个像素点代表一个粒子，遍历屏幕像素点更新粒子状态，从底部向上更新避免更新顺序影响物理效果
+    //每个像素点代表一个粒子，遍历更新粒子状态，从底部向上更新避免顺序影响物理效果
     for (int _y = windowRect.h - 1; _y >= 0; _y--)
     {
         for (int _x = 0; _x < windowRect.w; _x++)
         {
-			//从前缓冲区获取粒子，将更新结果写入后缓冲区
-            Particle& _particle = frontBuffer[_y * windowRect.w + _x];
-
-            //根据粒子类型调用更新函数
-            switch (_particle.type)
+            //根据前缓冲区粒子类型调用对应更新函数，更新结果均写入后缓冲区
+            switch (frontBuffer[_y][_x].type)
             {
-            //遇到空类型则直接跳过
-			case ParticleType::EMPTY: continue;
+			case ParticleType::EMPTY: UpdateEmpty(_x, _y); break;
             case ParticleType::DIRT: UpdateDirt(_x, _y); break;
             case ParticleType::STONE: UpdateStone(_x, _y); break;
             case ParticleType::WOOD: UpdateWood(_x, _y); break;
@@ -74,75 +84,67 @@ void ParticleManager::OnUpdate(double _delta)
 
 void ParticleManager::OnRender(SDL_Renderer* _renderer)
 {
-	//渲染每个像素点对应的粒子为一个特定颜色，并调整Gamma值模拟光影效果等
+	//渲染每个像素点的粒子，根据类型渲染颜色
     for (int _y = 0; _y < windowRect.h; _y++)
     {
         for (int _x = 0; _x < windowRect.w; _x++)
         {
-            Particle& _particle = frontBuffer[_y * windowRect.w + _x];
-            if (_particle.type == ParticleType::EMPTY) continue;
-
-            SDL_SetRenderDrawColor(_renderer,
-                _particle.color.r, _particle.color.g, _particle.color.b, _particle.color.a);
+            //根据粒子类型，获取渲染颜色
+            ParticleType _type = frontBuffer[_y][_x].type;
+			SDL_Color _color = PARTICLE_COLORS[static_cast<uint8_t>(_type)];
+            
+            SDL_SetRenderDrawColor(_renderer, _color.r, _color.g, _color.b, _color.a);
             SDL_RenderDrawPoint(_renderer, _x, _y);
         }
     }
 }
 
-void ParticleManager::AddParticle(int _x, int _y, ParticleType _type)
+void ParticleManager::SetParticleAt(int _x, int _y, ParticleType _type)
 {
     if (!IsValidPosition(_x, _y)) return;
 
-    Particle _particle;
-    _particle.type = _type;
-    _particle.updatedInThisFrame = false;
+    frontBuffer[_y][_x].type = _type;
+}
 
-    //设置粒子颜色
-    switch (_type)
+void ParticleManager::EmptizeParticleAt(int _x, int _y)
+{
+    if (!IsValidPosition(_x, _y)) return;
+
+    //将粒子类型置空
+    frontBuffer[_y][_x].type = ParticleType::EMPTY;
+}
+
+void ParticleManager::FillAllParticlesBy(ParticleType _type)
+{
+    //更新粒子类型，注意更新操作均在后缓冲区进行
+    for (std::vector<Particle>& _row : frontBuffer)
     {
-    case ParticleType::SAND: _particle.color = { 194, 178, 128, 255 }; break;
-    case ParticleType::WATER: _particle.color = { 64, 164, 223, 200 }; break;
-    case ParticleType::FIRE: _particle.color = { 255, 69, 0, 255 }; break;
-    case ParticleType::SMOKE: _particle.color = { 100, 100, 100, 180 }; break;
-    case ParticleType::STONE: _particle.color = { 120, 120, 120, 255 }; break;
-    case ParticleType::WOOD: _particle.color = { 150, 111, 51, 255 }; break;
-    case ParticleType::LAVA: _particle.color = { 207, 16, 32, 255 }; break;
-    case ParticleType::ACID: _particle.color = { 50, 255, 50, 200 }; break;
-    default: _particle.color = { 255, 255, 255, 255 }; break;
+        for (Particle& _particle : _row)
+            _particle.type = _type;
     }
-
-    frontBuffer[_y * windowRect.w + _x] = _particle;
-}
-
-void ParticleManager::RemoveParticle(int _x, int _y)
-{
-    //将粒子设置为空
-    if (IsValidPosition(_x, _y))
-        frontBuffer[_y * windowRect.w + _x] = Particle{};
-}
-
-void ParticleManager::ClearAllParticles()
-{
-    std::fill_n(frontBuffer, windowRect.w * windowRect.h, Particle{});
-    std::fill_n(backBuffer, windowRect.w * windowRect.h, Particle{});
-}
-
-Particle ParticleManager::GetParticle(int _x, int _y) const
-{
-	//获取指定位置的粒子对象，如果位置无效则返回空粒子
-    if (IsValidPosition(_x, _y))
-        return frontBuffer[_y * windowRect.w + _x];
-    return Particle{};
 }
 
 bool ParticleManager::IsValidPosition(int _x, int _y) const
 {
-	//检查坐标是否在窗口范围内
+    //检查坐标是否在窗口范围内
     return (_x >= windowRect.x && _x < windowRect.x + windowRect.w)
         && (_y >= windowRect.y && _y < windowRect.y + windowRect.h);
+
+    //请注意，目前实现的版本中每个像素点都是一个粒子瓦片，所以世界坐标和瓦片坐标一致
+	//若后续需实现更复杂的瓦片（如n*n个像素点代表一个粒子瓦片），则需注意进行坐标的映转换
+
+	//检查坐标是否在缓冲区范围内
+    //return (_y >= 0 && _y < frontBuffer.size())
+    //    && (_x >= 0 && _x < frontBuffer[0].size());
 }
 
 #pragma region UpdateSpecificParticleType
+void ParticleManager::UpdateEmpty(int _x, int _y)
+{
+	//空粒子不需要更新，置空类型后无需其它操作
+	backBuffer[_y][_x].type = ParticleType::EMPTY;
+}
+
 void ParticleManager::UpdateDirt(int _x, int _y)
 {
 }
@@ -161,44 +163,52 @@ void ParticleManager::UpdateIce(int _x, int _y)
 
 void ParticleManager::UpdateSand(int _x, int _y)
 {
-    Particle& p = frontBuffer[_y * windowRect.w + _x];
-
     //尝试向下移动
     if (IsValidPosition(_x, _y + 1))
     {
-        Particle& below = backBuffer[(_y + 1) * windowRect.w + _x];
-        if (below.type == ParticleType::EMPTY)
+        Particle& _below = backBuffer[_y + 1][_x];
+        if (_below.type == ParticleType::EMPTY)
         {
-            backBuffer[(_y + 1) * windowRect.w + _x] = p;
+            //先清空当前位置
+            backBuffer[_y][_x].type = ParticleType::EMPTY;
+			//向下方下落，将其粒子类型设置为沙子
+            backBuffer[_y + 1][_x].type = ParticleType::SAND;
             return;
         }
     }
 
     //随机选择先左下方还是先右下方
-    int dir = dist(rng) ? 1 : -1;
+    int _dir = dist(rng) ? 1 : -1;
+
     //尝试朝斜下方移动
-    if (IsValidPosition(_x + dir, _y + 1))
+    if (IsValidPosition(_x + _dir, _y + 1))
     {
-        Particle& diag = backBuffer[(_y + 1) * windowRect.w + _x + dir];
-        if (diag.type == ParticleType::EMPTY)
+        Particle& _diag = backBuffer[_y + 1][_x + _dir];
+        if (_diag.type == ParticleType::EMPTY)
         {
-            backBuffer[(_y + 1) * windowRect.w + _x + dir] = p;
+            //先清空当前位置
+            backBuffer[_y][_x].type = ParticleType::EMPTY;
+            //向斜下方下落，将其粒子类型设置为沙子
+            backBuffer[_y + 1][_x + _dir].type = ParticleType::SAND;
             return;
         }
     }
     //尝试另一个对角线
-    if (IsValidPosition(_x - dir, _y + 1))
+    if (IsValidPosition(_x - _dir, _y + 1))
     {
-        Particle& diag = backBuffer[(_y + 1) * windowRect.w + _x - dir];
+        Particle& diag = backBuffer[_y + 1][_x - _dir];
         if (diag.type == ParticleType::EMPTY)
         {
-            backBuffer[(_y + 1) * windowRect.w + _x - dir] = p;
+            //先清空当前位置
+			backBuffer[_y][_x].type = ParticleType::EMPTY;
+            //向斜下方下落，将其粒子类型设置为沙子
+            backBuffer[_y + 1][_x - _dir].type = ParticleType::SAND;
             return;
         }
     }
 
     //无法移动，保持原位
-    backBuffer[_y * windowRect.w + _x] = p;
+    backBuffer[_y][_x].type = ParticleType::SAND;
 }
 
 void ParticleManager::UpdateSnow(int _x, int _y)

@@ -5,7 +5,7 @@
 #include "../../../Header/Manager/Concrete/ParticleManager.h"
 #include "../../../Header/Manager/Concrete/ResourceManager.h"
 
-const std::vector<SDL_Color> PARTICLE_COLORS =
+const std::vector<SDL_Color> PARTICLE_UI_COLORS =
 {
     { 0, 0, 0, 0 },           //无颜色（透明）
     { 139, 69, 19, 255 },     //深棕色
@@ -50,7 +50,7 @@ UIW_ParticleBrushControl::UIW_ParticleBrushControl()
     #pragma region ParticleMappings
     //设置每种粒子类型对应的颜色
     for (int _i = 0; _i < _particleTypeCount; _i++)
-        particleColors[static_cast<ParticleType>(_i)] = PARTICLE_COLORS[_i];
+        particleColors[static_cast<ParticleType>(_i)] = PARTICLE_UI_COLORS[_i];
 
 	//初始化粒子类型按钮矩形，减去1是为了排除EMPTY类型
     for (int _i = 0; _i < _particleTypeCount - 1; _i++)
@@ -282,7 +282,7 @@ void UIW_ParticleBrushControl::DrawParticles(int _centerX, int _centerY, Particl
 
             //如果在圆内，添加粒子
             if (_dist <= _radius)
-                _pm.AddParticle(_x, _y, _type);
+                _pm.SetParticleAt(_x, _y, _type);
         }
     }
 }
@@ -308,7 +308,7 @@ void UIW_ParticleBrushControl::EraseParticles(int _centerX, int _centerY, int _r
 
             //如果在圆内，擦除粒子
             if (_dist <= _radius)
-                _pm.RemoveParticle(_x, _y);
+                _pm.EmptizeParticleAt(_x, _y);
         }
     }
 }
