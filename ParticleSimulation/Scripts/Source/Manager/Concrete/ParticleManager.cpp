@@ -47,13 +47,15 @@ ParticleManager::~ParticleManager()
 }
 
 void ParticleManager::OnUpdate(double _delta)
-{    
-    //重置后缓冲区，直接修改类型为EMPTY
+{
+    //重置后缓冲区，修改类型为EMPTY，重置更新状态
     for (Particle& _p : backBuffer)
+    {
         _p.type = ParticleType::EMPTY;
-    //使用resize会重新分配内存，效率低下
+		_p.isUpdatedThisFrame = false;
+    }
+    //使用resize会重新分配内存导致效率低下，也不要创建新对象导致额外开销
     //backBuffer.resize(windowRect.h * windowRect.w, ParticleType::EMPTY);
-    //此处发送了不必要的新对象创建
     //std::fill(backBuffer.begin(), backBuffer.end(), Particle{ ParticleType::EMPTY });
 
     //每个像素点代表一个粒子，从下向上遍历保证物理正确
@@ -62,18 +64,23 @@ void ParticleManager::OnUpdate(double _delta)
     {
         //使用位运算判断奇偶性比取模运算更快
         const bool _isSingularRow = _y & 1;
-
-        //奇数行从左向右遍历
+        
+        //奇数行从左向右遍历，偶数行从右向左遍历
         if (_isSingularRow)
         {
             for (int _x = 0; _x < windowRect.w; _x++)
-                UpdateParticle(_x, _y);
+            {
+				if (!frontBuffer[_y * windowRect.w + _x].isUpdatedThisFrame)
+                    UpdateParticle(_x, _y);
+            }
         }
-        //偶数行从右向左遍历
         else
         {
             for (int _x = windowRect.w - 1; _x >= 0; _x--)
-                UpdateParticle(_x, _y);
+            {
+                if (!frontBuffer[_y * windowRect.w + _x].isUpdatedThisFrame)
+                    UpdateParticle(_x, _y);
+            }
         }
     }
 	//交换缓冲区，将后缓冲区的更新结果作为前缓冲区的状态
@@ -117,12 +124,15 @@ void ParticleManager::EmptizeParticleAt(int _x, int _y)
 
 void ParticleManager::UpdateParticle(int _x, int _y)
 {
-    ParticleType& _type = frontBuffer[_y * windowRect.w + _x].type;
+    Particle& _particle = frontBuffer[_y * windowRect.w + _x];
+
+	//标记粒子在本帧已被更新，避免重复更新同一粒子
+    _particle.isUpdatedThisFrame = true;
 
     //根据前缓冲区粒子类型调用对应更新函数，更新结果均写入后缓冲区
-    switch (_type)
+    switch (_particle.type)
     {
-    case ParticleType::EMPTY: backBuffer[_y * windowRect.w + _x] = ParticleType::EMPTY; break;
+    case ParticleType::EMPTY: break; //空粒子直接跳过，防止额外开销
     case ParticleType::DIRT: UpdateDirt(_x, _y); break;
     case ParticleType::STONE: UpdateStone(_x, _y); break;
     case ParticleType::WOOD: UpdateWood(_x, _y); break;
