@@ -27,6 +27,11 @@ There are expected to be five groups of particles that can **reasonably interact
 
 ![Cover.png](https://github.com/WhythZ/ParticleSimulation/blob/master/Cover.png)
 
+Use your mouse to control the particle brush, you can choose particle type from the in-game UI
+- `Left Click`: Summon particles in brush region
+- `Left Click`: Clear particles in brush region
+- `Wheel Up/Down`: Increase/Decrease brush size
+
 ## TodoList
 - Interactivity Implementation
     - Liquid Particles
