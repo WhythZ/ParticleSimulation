@@ -75,6 +75,9 @@
     <ClCompile Include="Scripts\Source\UIWidget\UIWidget.cpp">
       <Filter>源文件\UIWidget</Filter>
     </ClCompile>
+    <ClCompile Include="Scripts\Source\UIWidget\Concrete\UIW_ClearAllParticlesButton.cpp">
+      <Filter>源文件\UIWidget\Concrete</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Scripts\Header\Manager\Manager.hpp">
@@ -109,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="Scripts\Header\Particle\ParticleType.h">
       <Filter>头文件\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Scripts\Header\UIWidget\Concrete\UIW_ClearAllParticlesButton.h">
+      <Filter>头文件\UIWidget\Concrete</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

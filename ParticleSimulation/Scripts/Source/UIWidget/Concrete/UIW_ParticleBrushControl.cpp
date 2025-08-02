@@ -282,7 +282,7 @@ void UIW_ParticleBrushControl::DrawParticles(int _centerX, int _centerY, Particl
 
             //如果在圆内，添加粒子
             if (_dist <= _radius)
-                _pm.SetParticleAt(_x, _y, _type);
+                _pm.BrushParticleAt(_x, _y, _type);
         }
     }
 }

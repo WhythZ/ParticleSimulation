@@ -71,7 +71,7 @@ void ParticleManager::OnUpdate(double _delta)
             for (int _x = 0; _x < windowRect.w; _x++)
             {
 				if (!frontBuffer[_y * windowRect.w + _x].isUpdatedThisFrame)
-                    UpdateParticle(_x, _y);
+                    UpdateParticleAt(_x, _y);
             }
         }
         else
@@ -79,7 +79,7 @@ void ParticleManager::OnUpdate(double _delta)
             for (int _x = windowRect.w - 1; _x >= 0; _x--)
             {
                 if (!frontBuffer[_y * windowRect.w + _x].isUpdatedThisFrame)
-                    UpdateParticle(_x, _y);
+                    UpdateParticleAt(_x, _y);
             }
         }
     }
@@ -107,7 +107,7 @@ void ParticleManager::OnRender(SDL_Renderer* _renderer)
     }
 }
 
-void ParticleManager::SetParticleAt(int _x, int _y, ParticleType _type)
+void ParticleManager::BrushParticleAt(int _x, int _y, ParticleType _type)
 {
     if (!IsValidPosition(_x, _y)) return;
 
@@ -122,7 +122,7 @@ void ParticleManager::EmptizeParticleAt(int _x, int _y)
     frontBuffer[_y * windowRect.w + _x].type = ParticleType::EMPTY;
 }
 
-void ParticleManager::UpdateParticle(int _x, int _y)
+void ParticleManager::UpdateParticleAt(int _x, int _y)
 {
     Particle& _particle = frontBuffer[_y * windowRect.w + _x];
 
@@ -151,6 +151,11 @@ void ParticleManager::UpdateParticle(int _x, int _y)
     }
 }
 
+void ParticleManager::WriteParticleAt(int _x, int _y, ParticleType _type)
+{
+    backBuffer[_y * windowRect.w + _x].type = _type;
+}
+
 bool ParticleManager::IsValidPosition(int _x, int _y) const
 {
     //检查坐标是否在窗口范围内
@@ -161,29 +166,86 @@ bool ParticleManager::IsValidPosition(int _x, int _y) const
 	//若后续需实现更复杂的瓦片（如n*n个像素点代表一个粒子瓦片），则需注意进行坐标的转换
 }
 
+bool ParticleManager::IsEmptyPType(int _x, int _y) const
+{
+    if (!IsValidPosition(_x, _y)) return false;
+
+    int _idx = _y * windowRect.w + _x;
+    return backBuffer[_idx].type == ParticleType::EMPTY;
+}
+
+bool ParticleManager::IsSolidPType(int _x, int _y) const
+{
+    if (!IsValidPosition(_x, _y)) return false;
+
+    int _idx = _y * windowRect.w + _x;
+    return backBuffer[_idx].type == ParticleType::DIRT
+        || backBuffer[_idx].type == ParticleType::STONE
+        || backBuffer[_idx].type == ParticleType::WOOD
+        || backBuffer[_idx].type == ParticleType::ICE;
+}
+
+bool ParticleManager::IsPowderPType(int _x, int _y) const
+{
+    if (!IsValidPosition(_x, _y)) return false;
+
+    int _idx = _y * windowRect.w + _x;
+    return backBuffer[_idx].type == ParticleType::SAND
+        || backBuffer[_idx].type == ParticleType::SNOW
+        || backBuffer[_idx].type == ParticleType::GUNPOWDER;
+}
+
+bool ParticleManager::IsLiquidPType(int _x, int _y) const
+{
+    if (!IsValidPosition(_x, _y)) return false;
+
+    int _idx = _y * windowRect.w + _x;
+    return backBuffer[_idx].type == ParticleType::WATER
+        || backBuffer[_idx].type == ParticleType::OIL
+        || backBuffer[_idx].type == ParticleType::ACID
+        || backBuffer[_idx].type == ParticleType::LAVA;
+}
+
+bool ParticleManager::IsSpreadPType(int _x, int _y) const
+{
+    if (!IsValidPosition(_x, _y)) return false;
+
+    int _idx = _y * windowRect.w + _x;
+    return backBuffer[_idx].type == ParticleType::FIRE;
+}
+
+bool ParticleManager::IsGasPType(int _x, int _y) const
+{
+    if (!IsValidPosition(_x, _y)) return false;
+
+    int _idx = _y * windowRect.w + _x;
+    return backBuffer[_idx].type == ParticleType::SMOKE
+        || backBuffer[_idx].type == ParticleType::STEAM;
+}
+
 #pragma region UpdateSolid
 void ParticleManager::UpdateDirt(int _x, int _y)
 {
     //位置固定不动
-	backBuffer[_y * windowRect.w + _x].type = ParticleType::DIRT;
+    WriteParticleAt(_x, _y, ParticleType::DIRT);
 }
 
 void ParticleManager::UpdateStone(int _x, int _y)
 {
     //位置固定不动
-    backBuffer[_y * windowRect.w + _x].type = ParticleType::STONE;
+    WriteParticleAt(_x, _y, ParticleType::STONE);
 }
 
 void ParticleManager::UpdateWood(int _x, int _y)
 {
     //位置固定不动
-    backBuffer[_y * windowRect.w + _x].type = ParticleType::WOOD;
+    WriteParticleAt(_x, _y, ParticleType::WOOD);
 }
 
 void ParticleManager::UpdateIce(int _x, int _y)
 {
     //位置固定不动
-    backBuffer[_y * windowRect.w + _x].type = ParticleType::ICE;
+    WriteParticleAt(_x, _y, ParticleType::ICE);
 }
 #pragma endregion
 
@@ -191,59 +253,39 @@ void ParticleManager::UpdateIce(int _x, int _y)
 void ParticleManager::UpdateSand(int _x, int _y)
 {
     //缓存常用值
-    int _currentIdx = _y * windowRect.w + _x;
     ParticleType _currentType = ParticleType::SAND;
-
-    #pragma region Below
-    //尝试向下移动
-    if (IsValidPosition(_x, _y + 1))
-    {
-        int _belowIdx = (_y + 1) * windowRect.w + _x;
-        if (backBuffer[_belowIdx].type == ParticleType::EMPTY)
-        {
-            //先清空当前位置
-            backBuffer[_currentIdx].type = ParticleType::EMPTY;
-			//向下方下落，将其粒子类型替换
-            backBuffer[_belowIdx].type = _currentType;
-            return;
-        }
-    }
-    #pragma endregion
-
+    
+    #pragma region TryMove
     //随机选择先左还是先右
     int _dir = dist(rng) ? 1 : -1;
-    
-    #pragma region Diagonal
-    //尝试朝斜下方移动
-    if (IsValidPosition(_x + _dir, _y + 1))
+    //尝试向下移动
+    if (IsEmptyPType(_x, _y + 1))
     {
-		int _diagIdx = (_y + 1) * windowRect.w + (_x + _dir);
-        if (backBuffer[_diagIdx].type == ParticleType::EMPTY)
-        {
-            //先清空当前位置
-            backBuffer[_currentIdx].type = ParticleType::EMPTY;
-            //向斜下方下落，将其粒子类型替换
-            backBuffer[_diagIdx].type = _currentType;
-            return;
-        }
+        //先清空当前位置
+        WriteParticleAt(_x, _y, ParticleType::EMPTY);
+        //向下方下落，将其粒子类型替换
+        WriteParticleAt(_x, _y + 1, _currentType);
+    }
+    //尝试朝斜下方移动
+    else if (IsEmptyPType(_x + _dir, _y + 1))
+    {
+        //先清空当前位置
+        WriteParticleAt(_x, _y, ParticleType::EMPTY);
+        //向斜下方下落，将其粒子类型替换
+        WriteParticleAt(_x + _dir, _y + 1, _currentType);
     }
     //尝试另一个对角线
-    if (IsValidPosition(_x - _dir, _y + 1))
+    else if (IsEmptyPType(_x - _dir, _y + 1))
     {
-        int _diagIdx = (_y + 1) * windowRect.w + (_x - _dir);
-        if (backBuffer[_diagIdx].type == ParticleType::EMPTY)
-        {
-            //先清空当前位置
-			backBuffer[_currentIdx].type = ParticleType::EMPTY;
-            //向斜下方下落，将其粒子类型替换
-            backBuffer[_diagIdx].type = _currentType;
-            return;
-        }
+        //先清空当前位置
+        WriteParticleAt(_x, _y, ParticleType::EMPTY);
+        //向斜下方下落，将其粒子类型替换
+        WriteParticleAt(_x - _dir, _y + 1, _currentType);
     }
-    #pragma endregion
-
     //无法移动，保持原位
-    backBuffer[_currentIdx].type = _currentType;
+    else
+        WriteParticleAt(_x, _y, _currentType);
+    #pragma endregion
 }
 
 void ParticleManager::UpdateSnow(int _x, int _y)
@@ -262,84 +304,55 @@ void ParticleManager::UpdateWater(int _x, int _y)
     int _currentIdx = _y * windowRect.w + _x;
     ParticleType _currentType = ParticleType::WATER;
 
-    #pragma region Below
-    //尝试向下移动
-    if (IsValidPosition(_x, _y + 1))
-    {
-        int _belowIdx = (_y + 1) * windowRect.w + _x;
-        if (backBuffer[_belowIdx].type == ParticleType::EMPTY)
-        {
-            //先清空当前位置
-            backBuffer[_currentIdx].type = ParticleType::EMPTY;
-            //向下方下落，将其粒子类型替换
-            backBuffer[_belowIdx].type = _currentType;
-            return;
-        }
-    }
-    #pragma endregion
-
+    #pragma region TryMove
     //随机选择先左还是先右
     int _dir = dist(rng) ? 1 : -1;
-
-    #pragma region Diagonal
-    //尝试朝斜下方移动
-    if (IsValidPosition(_x + _dir, _y + 1))
+    //尝试向下移动
+    if (IsEmptyPType(_x, _y + 1))
     {
-        int _diagIdx = (_y + 1) * windowRect.w + (_x + _dir);
-        if (backBuffer[_diagIdx].type == ParticleType::EMPTY)
-        {
-            //先清空当前位置
-            backBuffer[_currentIdx].type = ParticleType::EMPTY;
-            //向斜下方下落，将其粒子类型替换
-            backBuffer[_diagIdx].type = _currentType;
-            return;
-        }
+        //先清空当前位置
+        WriteParticleAt(_x, _y, ParticleType::EMPTY);
+        //向下方下落，将其粒子类型替换
+        WriteParticleAt(_x, _y + 1, _currentType);
+    }
+    //尝试朝斜下方移动
+    else if (IsEmptyPType(_x + _dir, _y + 1))
+    {
+        //先清空当前位置
+        WriteParticleAt(_x, _y, ParticleType::EMPTY);
+        //向斜下方下落，将其粒子类型替换
+        WriteParticleAt(_x + _dir, _y + 1, _currentType);
     }
     //尝试另一个对角线
-    if (IsValidPosition(_x - _dir, _y + 1))
+    else if (IsEmptyPType(_x - _dir, _y + 1))
     {
-        int _diagIdx = (_y + 1) * windowRect.w + (_x - _dir);
-        if (backBuffer[_diagIdx].type == ParticleType::EMPTY)
-        {
-            //先清空当前位置
-            backBuffer[_currentIdx].type = ParticleType::EMPTY;
-            //向斜下方下落，将其粒子类型替换
-            backBuffer[_diagIdx].type = _currentType;
-            return;
-        }
+        //先清空当前位置
+        WriteParticleAt(_x, _y, ParticleType::EMPTY);
+        //向斜下方下落，将其粒子类型替换
+        WriteParticleAt(_x - _dir, _y + 1, _currentType);
     }
-    #pragma endregion
-
-    #pragma region Horizontal
-    //液体还可以向左右移动，但问题时此处逻辑会导致粒子在同一帧内被多次处理
-    if (IsValidPosition(_x + _dir, _y))
+    //液体还可以向左右移动，但只能当其下方存在阻挡时才会尝试
+    else if (IsSolidPType(_x, _y + 1) || IsPowderPType(_x, _y + 1) || IsLiquidPType(_x, _y + 1))
     {
-        int _horiIdx = _y * windowRect.w + (_x + _dir);
-        if (backBuffer[_horiIdx].type == ParticleType::EMPTY)
+        if (IsEmptyPType(_x + _dir, _y))
         {
             //先清空当前位置
-            backBuffer[_currentIdx].type = ParticleType::EMPTY;
+            //WriteParticleAt(_x, _y, ParticleType::EMPTY);
             //向水平方向移动
-            backBuffer[_horiIdx].type = _currentType;
-            return;
+            WriteParticleAt(_x + _dir, _y, _currentType);
         }
-    }
-    if (IsValidPosition(_x - _dir, _y))
-    {
-        int _horiIdx = _y * windowRect.w + (_x - _dir);
-        if (backBuffer[_horiIdx].type == ParticleType::EMPTY)
+        else if (IsEmptyPType(_x - _dir, _y))
         {
             //先清空当前位置
-            backBuffer[_currentIdx].type = ParticleType::EMPTY;
+            //WriteParticleAt(_x, _y, ParticleType::EMPTY);
             //向水平方向移动
-            backBuffer[_horiIdx].type = _currentType;
-            return;
+            WriteParticleAt(_x - _dir, _y, _currentType);
         }
     }
-    #pragma endregion
-
     //无法移动，保持原位
-    backBuffer[_currentIdx].type = _currentType;
+    else
+        WriteParticleAt(_x, _y, _currentType);
+    #pragma endregion
 }
 
 void ParticleManager::UpdateOil(int _x, int _y)

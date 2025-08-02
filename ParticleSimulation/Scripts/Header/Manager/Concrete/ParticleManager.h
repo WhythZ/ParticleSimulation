@@ -34,16 +34,23 @@ public:
 	void OnUpdate(double);                            //双缓冲更新屏幕画面
 	void OnRender(SDL_Renderer*);
 
-	void SetParticleAt(int, int, ParticleType);
+	void BrushParticleAt(int, int, ParticleType);     //在前缓冲区绘制粒子类型
 	void EmptizeParticleAt(int, int);
 
 private:
 	ParticleManager();
 	~ParticleManager();
 
-	inline void UpdateParticle(int, int);
+	inline void UpdateParticleAt(int, int);
+	inline void WriteParticleAt(int, int, ParticleType);
 
 	inline bool IsValidPosition(int, int) const;      //检查坐标是否在窗口范围内
+	inline bool IsEmptyPType(int, int) const;         //检坐标上粒子是否是空粒子
+	inline bool IsSolidPType(int, int) const;         //检坐标上粒子是否是固体粒子
+	inline bool IsPowderPType(int, int) const;        //检坐标上粒子是否是粉末粒子
+	inline bool IsLiquidPType(int, int) const;        //检坐标上粒子是否是液体粒子
+	inline bool IsSpreadPType(int, int) const;        //检坐标上粒子是否是蔓延粒子
+	inline bool IsGasPType(int, int) const;           //检坐标上粒子是否是气体粒子
 
 	#pragma region UpdateSolid
 	void UpdateDirt(int, int);

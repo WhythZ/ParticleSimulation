@@ -6,11 +6,13 @@
 #include "../../../Header/Manager/Concrete/GameManager.h"
 #include "../../../Header/Manager/Concrete/ParticleManager.h"
 #include "../../../Header/UIWidget/Concrete/UIW_ParticleBrushControl.h"
+#include "../../../Header/UIWidget/Concrete/UIW_ClearAllParticlesButton.h"
 
 UIManager::UIManager()
 {
 	//初始化UI组件
-	uiWidgets.emplace_back(new UIW_ParticleBrushControl());
+    uiWidgets.emplace_back(new UIW_ParticleBrushControl());
+    uiWidgets.emplace_back(new UIW_ClearAllParticlesButton());
 }
 
 UIManager::~UIManager()
